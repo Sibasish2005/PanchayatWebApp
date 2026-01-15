@@ -67,7 +67,12 @@ export default function Navbar() {
             </Link>
 
             <button className="text-white bg-blue-600 rounded-3xl px-4 py-2 text-sm">
+              <Link
+              href="/register"
+              className="text-white bg-blue-600 rounded-3xl  text-sm"
+            >
               Register
+            </Link>
             </button>
           </div>
         </div>

@@ -89,101 +89,139 @@ export default function Application() {
         </div>
 
         {/* Form */}
-        <form onSubmit={createApplication} className="bg-white rounded-lg p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
-          {/* Service Selection */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Select Service
-            </label>
-            <select onChange={(e)=>(setService(e.target.value))} className="w-full border border-gray-300 rounded px-3 py-2">
-              <option value="">-- Select Service --</option>
-              <option>Income Certificate</option>
-              <option>Caste Certificate</option>
-              <option>Permanent Residence Of Tripura Certificate</option>
-              <option>Birth Certificate</option>
-            </select>
-          </div>
+       <form
+  onSubmit={createApplication}
+  className="
+    bg-white rounded-xl p-5 sm:p-7 md:p-10
+    space-y-6
+    shadow-sm border border-gray-100
+  "
+>
+  {/* Form grid (same fields, better layout) */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    {/* Service Selection */}
+    <div className="md:col-span-2">
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Select Service <span className="text-red-600">*</span>
+      </label>
+      <select
+        onChange={(e) => setService(e.target.value)}
+        className="
+          w-full border border-gray-300 rounded-lg px-4 py-2.5
+          bg-white text-gray-800
+          focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600
+          transition
+        "
+      >
+        <option value="">-- Select Service --</option>
+        <option>Income Certificate</option>
+        <option>Caste Certificate</option>
+        <option>Permanent Residence Of Tripura Certificate</option>
+        <option>Birth Certificate</option>
+      </select>
+      <p className="text-xs text-gray-500 mt-1">
+        Choose the service you want to apply for.
+      </p>
+    </div>
 
-          {/* Applicant Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Applicant Name
-            </label>
-            <input
-              onChange={(e)=>(setName(e.target.value))}
-              type="text"
-              placeholder="Enter full name"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
+    {/* Applicant Name */}
+    <div>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Applicant Name <span className="text-red-600">*</span>
+      </label>
+      <input
+        onChange={(e) => setName(e.target.value)}
+        type="text"
+        placeholder="Enter full name"
+        className="
+          w-full border border-gray-300 rounded-lg px-4 py-2.5
+          focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600
+          transition
+        "
+      />
+    </div>
 
-          {/* Mobile */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Mobile Number
-            </label>
-            <input
-              onChange={(e)=>(setMobileNo(e.target.value))}
-              type="text"
-              placeholder="Enter mobile number"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
+    {/* Mobile */}
+    <div>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Mobile Number <span className="text-red-600">*</span>
+      </label>
+      <input
+        onChange={(e) => setMobileNo(e.target.value)}
+        type="text"
+        placeholder="Enter mobile number"
+        className="
+          w-full border border-gray-300 rounded-lg px-4 py-2.5
+          focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600
+          transition
+        "
+      />
+     
+    </div>
 
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Address</label>
-            <input
-              onChange={(e)=>(setAddress(e.target.value))}
-              type="text"
-              placeholder="Enter address"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
+    {/* Address */}
+    <div className="md:col-span-2">
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Address <span className="text-red-600">*</span>
+      </label>
+      <input
+        onChange={(e) => setAddress(e.target.value)}
+        type="text"
+        placeholder="Enter address"
+        className="
+          w-full border border-gray-300 rounded-lg px-4 py-2.5
+          focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600
+          transition
+        "
+      />
+    </div>
 
-          {/* Document Selection */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Select Document Type
-            </label>
-            <select onChange={(e)=>(setDocumentType(e.target.value))} className="w-full border border-gray-300 rounded px-3 py-2">
-              <option value="">-- Select Document --</option>
-              <option>Aadhaar Card</option>
-              <option>Voter ID</option>
-              <option>Ration Card</option>
-            </select>
-          </div>
+    {/* Document Selection */}
+    <div className="md:col-span-2">
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Select Document Type <span className="text-red-600">*</span>
+      </label>
+      <select
+        onChange={(e) => setDocumentType(e.target.value)}
+        className="
+          w-full border border-gray-300 rounded-lg px-4 py-2.5
+          bg-white text-gray-800
+          focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600
+          transition
+        "
+      >
+        <option value="">-- Select Document --</option>
+        <option>Aadhaar Card</option>
+        <option>Voter ID</option>
+        <option>Ration Card</option>
+      </select>
 
-          {/* Upload Section */}
-          {/* <div>
-            <label className="block text-sm font-medium mb-1">
-              Upload Document (Image / PDF)
-            </label>
-            <input
-              type="file"
-              accept="image/*,.pdf"
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Accepted formats: JPG, PNG, PDF (Max 2MB)
-            </p>
-          </div> */}
+      
+    </div>
+  </div>
 
-          {/* Submit */}
-          <div className="pt-4">
-            <button
-              type="submit"
-              className="
-                w-full sm:w-auto
-                bg-blue-700 hover:bg-blue-800
-                text-white px-6 py-2
-                rounded transition
-              "
-            >
-              Submit Application
-            </button>
-          </div>
-        </form>
+  {/* Submit */}
+  <div className="pt-2 flex justify-center w-full sm:justify-start">
+    <button
+      type="submit"
+      disabled={loading}
+      className="
+        w-full sm:w-auto
+        bg-blue-700 hover:bg-blue-800
+        disabled:bg-blue-400 disabled:cursor-not-allowed
+        text-white px-8 py-2.5
+        rounded-lg font-semibold
+        shadow-sm hover:shadow-md
+        transition
+      "
+    >
+      {loading ? "Submitting..." : "Submit Application"}
+    </button>
+  </div>
+
+  
+</form>
+
       </div>
       <div id="get" className="">
         
