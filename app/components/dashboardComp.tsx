@@ -135,7 +135,7 @@ export default function DashboardComp() {
           prev.map((app) => (app._id === id ? result.data : app))
         );
 
-        toast.success("Updated successfully ✅", { id: toastId });
+        toast.success("Updated successfully ", { id: toastId });
         cancelEdit();
       } else {
         toast.error(result.message || "Update failed", { id: toastId });

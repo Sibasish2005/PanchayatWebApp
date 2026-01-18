@@ -5,7 +5,6 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-200 mt-10">
       {/* Top Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        
         {/* Logo / About */}
         <div>
           <h2 className="text-lg font-bold text-white">Panchayat Portal</h2>
@@ -76,6 +75,11 @@ export default function Footer() {
             <p>📍 Panchayat Office, Your Village</p>
             <p>📞 Helpline: +91 98765 43210</p>
             <p>✉️ Email: support@panchayat.gov.in</p>
+            <p>
+              “This is a student project / demo application.” “Not affiliated
+              with any government organization.” “Do not enter real personal
+              data.”
+            </p>
           </div>
         </div>
       </div>
@@ -83,7 +87,9 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
-          <p>© {new Date().getFullYear()} Panchayat Portal. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} Panchayat Portal. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
