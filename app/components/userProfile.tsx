@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 type UserDataProps = {
   username: string;
@@ -9,6 +12,7 @@ type UserDataProps = {
   dateOfRegistration: string;
   address: string;
   accountStatus: boolean | string;
+  onAddressUpdate?: (newAddress: string) => void;
 };
 
 export default function UserProfile({
@@ -20,8 +24,53 @@ export default function UserProfile({
   dateOfRegistration,
   address,
   accountStatus,
+  onAddressUpdate,
 }: UserDataProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedAddress, setEditedAddress] = useState(address || "");
+  const [isSaving, setIsSaving] = useState(false);
   const isActive = accountStatus === true || accountStatus === "Active";
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedAddress(address || "");
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedAddress(address || "");
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address: editedAddress }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Address updated successfully!");
+        setIsEditing(false);
+        // Call the callback to update parent component
+        if (onAddressUpdate) {
+          onAddressUpdate(editedAddress);
+        }
+      } else {
+        toast.error(result.message || "Failed to update address");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     // This wrapper makes the component BIGGER on laptop & good spacing on mobile
@@ -59,9 +108,31 @@ export default function UserProfile({
               </div>
 
               {/*  Edit Button */}
-              <button className="mt-5 w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm transition">
-                Edit Profile
-              </button>
+              {!isEditing ? (
+                <button 
+                  onClick={handleEdit}
+                  className="mt-5 w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm transition"
+                >
+                  Edit Address
+                </button>
+              ) : (
+                <div className="mt-5 flex gap-2">
+                  <button 
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg text-sm transition"
+                  >
+                    {isSaving ? "Saving..." : "Save"}
+                  </button>
+                  <button 
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
 
             {/*  Right Details Section */}
@@ -75,11 +146,24 @@ export default function UserProfile({
                 <Detail label="User ID" value={userId} />
                 <Detail label="Email" value={email} />
                 <Detail label="Mobile Number" value={mobileNo} />
-                <Detail label="Date of Registration" value={dateOfRegistration} />
+                <Detail label="Date of Registration" value={dateOfRegistration || "Not available"} />
 
                 {/*  Address full width */}
                 <div className="md:col-span-2">
-                  <Detail label="Address" value={address} />
+                  {isEditing ? (
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Address</p>
+                      <textarea
+                        value={editedAddress}
+                        onChange={(e) => setEditedAddress(e.target.value)}
+                        placeholder="Enter your address"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
+                      />
+                    </div>
+                  ) : (
+                    <Detail label="Address" value={address || "Not provided"} />
+                  )}
                 </div>
               </div>
             </div>
@@ -93,10 +177,11 @@ export default function UserProfile({
 
 /* ✅ Small reusable box */
 function Detail({ label, value }: { label: string; value: string }) {
+  const displayValue = value || "Not provided";
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="font-semibold text-gray-900 break-words mt-1">{value}</p>
+      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
+      <p className="font-semibold text-gray-900 break-words mt-1">{displayValue}</p>
     </div>
   );
 }

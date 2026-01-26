@@ -1,12 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Page() {
+  const [emailOrMobile, setEmailOrMobile] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!emailOrMobile || !password) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        emailOrMobile,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Login successful!");
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 relative overflow-hidden">
-      {/* ✅ Background animated blobs (soft gov style) */}
+      {/* Background animated blobs */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.4, scale: 1 }}
@@ -20,7 +59,7 @@ export default function Page() {
         className="absolute -bottom-24 -right-24 w-72 h-72 bg-indigo-300 rounded-full blur-3xl"
       />
 
-      {/* ✅ Main Card Animation */}
+      {/* Main Card Animation */}
       <motion.div
         initial={{ opacity: 0, y: 35 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,7 +88,7 @@ export default function Page() {
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Email / Mobile */}
           <motion.div
             initial={{ opacity: 0, x: -15 }}
@@ -62,6 +101,8 @@ export default function Page() {
             <input
               type="text"
               placeholder="Enter email or mobile number"
+              value={emailOrMobile}
+              onChange={(e) => setEmailOrMobile(e.target.value)}
               className="
                 mt-1 w-full px-4 py-2
                 border border-gray-300 rounded-lg
@@ -82,6 +123,8 @@ export default function Page() {
             <input
               type="password"
               placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="
                 mt-1 w-full px-4 py-2
                 border border-gray-300 rounded-lg
@@ -107,18 +150,19 @@ export default function Page() {
             </a>
           </motion.div>
 
-          {/* ✅ Login button animation */}
+          {/* Login button */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            type="button"
+            type="submit"
+            disabled={loading}
             className="
-              w-full bg-blue-700 hover:bg-blue-800
+              w-full bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400
               text-white py-2 rounded-lg
               font-semibold transition
             "
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </motion.button>
 
           {/* Divider */}
@@ -143,9 +187,7 @@ export default function Page() {
               Register here
             </a>
           </motion.p>
-        </div>
-
-        
+        </form>
       </motion.div>
     </div>
   );

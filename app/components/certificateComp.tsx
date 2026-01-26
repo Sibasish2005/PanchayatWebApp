@@ -14,7 +14,7 @@ export default function CertificateComp() {
     {
       serviceName: "Permanent Residence Of Tripura Certificate",
       fileName: "residence-certificate.pdf",
-      status: "Approved",
+      status: "Pending",
     },
     {
       serviceName: "Caste Certificate",
@@ -24,7 +24,7 @@ export default function CertificateComp() {
     {
       serviceName: "Income Certificate",
       fileName: "income-certificate.pdf",
-      status: "Approved",
+      status: "Pending",
     },
   ];
 

@@ -6,6 +6,7 @@ export interface User extends Document {
     userId: string,
     email: string,
     mobileNo: string,
+    password: string, // ✅ Add password field
     dateOfRegistration: string ,
     address: string,
     accountStatus: boolean
@@ -32,10 +33,16 @@ const UserDataSchema: Schema<User> = new Schema({
     email: {
         type: String,
         required: true,
+        unique: true // ✅ Make email unique
     },
     mobileNo: {
         type: String,
         required: true
+    },
+    password: { // ✅ Add password field
+        type: String,
+        required: true,
+        minlength: 6
     },
     dateOfRegistration: {
         type: String,
@@ -48,8 +55,6 @@ const UserDataSchema: Schema<User> = new Schema({
         type: Boolean,
         default: false
     }
-
-
 })
 
 const UserDataModel:Model<User> = mongoose.models.User || mongoose.model<User>("User",UserDataSchema)

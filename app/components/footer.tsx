@@ -75,12 +75,19 @@ export default function Footer() {
             <p>📍 Panchayat Office, Your Village</p>
             <p>📞 Helpline: +91 98765 43210</p>
             <p>✉️ Email: support@panchayat.gov.in</p>
-            <p>
-              “This is a student project / demo application.” “Not affiliated
-              with any government organization.” “Do not enter real personal
-              data.”
-            </p>
           </div>
+        </div>
+      </div>
+
+      {/* Demo Disclaimer - Bold and Prominent */}
+      <div className="border-t border-gray-700 bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4">
+          <p className="text-center text-sm sm:text-base font-bold text-yellow-400">
+            ⚠️ THIS IS A DEMO PROJECT - NOT A PHISHING SITE ⚠️
+          </p>
+          <p className="text-center text-xs sm:text-sm text-gray-300 mt-2">
+            This is a student project / demo application. Not affiliated with any government organization. Do not enter real personal data.
+          </p>
         </div>
       </div>
 

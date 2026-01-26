@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
 
   return (
     <div>
-      {/*  LOGO BAR */}
+      {/* ================= LOGO BAR ================= */}
       <div
         id="logobox"
         className="
@@ -28,7 +31,7 @@ export default function Navbar() {
             alt="gov logo"
           />
 
-          {/*  Mobile Hamburger */}
+          {/* Mobile Hamburger */}
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden text-blue-950 font-bold text-2xl"
@@ -48,83 +51,108 @@ export default function Navbar() {
 
             {/* Language */}
             <div className="font-bold flex items-center gap-2">
-              <img
-                src="/internet.png"
-                className="h-4 w-4"
-                alt="language icon"
-              />
+              <img src="/internet.png" className="h-4 w-4" alt="language icon" />
               <span className="text-gray-400 text-sm">English</span>
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* ================= LOGIN / LOGOUT BUTTONS ================= */}
           <div id="buttons" className="flex gap-2">
-            <Link
-              href="/login"
-              className="text-white bg-blue-600 rounded-3xl px-4 py-2 text-sm"
-            >
-              Login
-            </Link>
-
-            <button className="text-white bg-blue-600 rounded-3xl px-4 py-2 text-sm">
-              <Link
-              href="/register"
-              className="text-white bg-blue-600 rounded-3xl  text-sm"
-            >
-              Register
-            </Link>
-            </button>
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  href="/login"
+                  className="text-white bg-blue-600 rounded-3xl px-4 py-2 text-sm"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-white bg-blue-600 rounded-3xl px-4 py-2 text-sm"
+                >
+                  Register
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="text-white bg-red-600 rounded-3xl px-4 py-2 text-sm"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/*  NAVBAR */}
+      {/* ================= MAIN NAVBAR ================= */}
       <div className="bg-blue-950 text-white">
         <div className="flex justify-between items-center h-12 px-4 md:px-10">
           <h2 className="font-bold md:hidden">Menu</h2>
 
-          {/* Desktop Links */}
+          {/* ================= DESKTOP LINKS ================= */}
           <ul className="hidden md:flex font-bold gap-6">
+            {/* ✅ Home - Always visible (public) */}
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Link href="/">Home</Link>
             </motion.li>
-            <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/user">User</Link>
-            </motion.li>
-            <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/apply">Application</Link>
-            </motion.li>
-            <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/dashboard">Dashboard</Link>
-            </motion.li>
-            <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link href="/certificate">Certificates</Link>
-            </motion.li>
+
+            {/* ✅ Protected links - Only visible when logged in */}
+            {isLoggedIn && (
+              <>
+                <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/user">User</Link>
+                </motion.li>
+
+                <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/apply">Application</Link>
+                </motion.li>
+
+                <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/dashboard">Dashboard</Link>
+                </motion.li>
+
+                <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/certificate">Certificates</Link>
+                </motion.li>
+              </>
+            )}
+
+            {/* ✅ About Us - Always visible (public) - Last position */}
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Link href="/AboutUs">About Us</Link>
             </motion.li>
           </ul>
         </div>
 
-        {/*  Mobile Dropdown Menu */}
+        {/* ================= MOBILE DROPDOWN ================= */}
         {open && (
           <div className="md:hidden bg-blue-950 px-4 pb-4">
             <ul className="flex flex-col font-bold gap-4">
+              {/* ✅ Home - Always visible (public) */}
               <Link onClick={() => setOpen(false)} href="/">
                 Home
               </Link>
-              <Link onClick={() => setOpen(false)} href="/user">
-                User
-              </Link>
-              <Link onClick={() => setOpen(false)} href="/apply">
-                Application
-              </Link>
-              <Link onClick={() => setOpen(false)} href="/dashboard">
-                Dashboard
-              </Link>
-              <Link onClick={() => setOpen(false)} href="/certificate">
-                Certificates
-              </Link>
+
+              {/* ✅ Protected links - Only visible when logged in */}
+              {isLoggedIn && (
+                <>
+                  <Link onClick={() => setOpen(false)} href="/user">
+                    User
+                  </Link>
+                  <Link onClick={() => setOpen(false)} href="/apply">
+                    Application
+                  </Link>
+                  <Link onClick={() => setOpen(false)} href="/dashboard">
+                    Dashboard
+                  </Link>
+                  <Link onClick={() => setOpen(false)} href="/certificate">
+                    Certificates
+                  </Link>
+                </>
+              )}
+
+              {/* ✅ About Us - Always visible (public) - Last position */}
               <Link onClick={() => setOpen(false)} href="/AboutUs">
                 About Us
               </Link>

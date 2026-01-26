@@ -1,12 +1,134 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function Page() {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    mobileNo: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted with data:", { ...formData, password: "***" });
+
+    // Validation
+    if (!formData.fullName || !formData.email || !formData.mobileNo || !formData.password) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    console.log("Starting registration process...");
+
+    try {
+      // Generate userId (max 20 characters)
+      // Take first 16 chars of email prefix + last 4 digits of timestamp
+      const emailPrefix = formData.email.split("@")[0];
+      const timestamp = Date.now().toString().slice(-4);
+      // Ensure total length is max 20 characters
+      const maxPrefixLength = 20 - timestamp.length; // 20 - 4 = 16
+      const truncatedPrefix = emailPrefix.slice(0, maxPrefixLength);
+      const userId = truncatedPrefix + timestamp;
+
+      // Create user data (password will be hashed on server)
+      const userData = {
+        username: formData.fullName,
+        usertype: "citizen", // Default user type
+        userId: userId, // Generate unique userId (max 20 chars)
+        email: formData.email,
+        mobileNo: formData.mobileNo,
+        password: formData.password, // Send plain password, server will hash it
+        dateOfRegistration: new Date().toISOString(),
+        address: "",
+        accountStatus: true, // Auto-activate for now
+      };
+
+      // Register user
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+      console.log("Registration response:", { status: response.status, result });
+
+      // Check both response status and result.success
+      if (response.ok && result.success) {
+        toast.success("Registration successful! Logging you in...");
+        
+        // Small delay to ensure user is saved in database
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Automatically sign in the user after registration
+        try {
+          const signInResult = await signIn("credentials", {
+            emailOrMobile: formData.email,
+            password: formData.password,
+            redirect: false,
+          });
+
+          console.log("Sign in result:", signInResult);
+
+          if (signInResult?.error) {
+            toast.error(`Registration successful but login failed: ${signInResult.error}. Please login manually.`);
+            setLoading(false);
+            router.push("/login");
+          } else {
+            // Success - redirect to home
+            toast.success("Welcome! Redirecting to home...");
+            // Force a full page reload to ensure session is set
+            window.location.replace("/");
+          }
+        } catch (signInError) {
+          console.error("Sign in error:", signInError);
+          toast.error("Registration successful but auto-login failed. Please login manually.");
+          setLoading(false);
+          router.push("/login");
+        }
+      } else {
+        toast.error(result.message || "Registration failed");
+        setLoading(false);
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast.error(error.message || "Something went wrong");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 relative overflow-hidden">
-      {/* ✅ Background soft blobs */}
+      {/* Background soft blobs */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.4, scale: 1 }}
@@ -20,7 +142,7 @@ export default function Page() {
         className="absolute -bottom-24 -right-24 w-72 h-72 bg-indigo-300 rounded-full blur-3xl"
       />
 
-      {/* ✅ Main Card */}
+      {/* Main Card */}
       <motion.div
         initial={{ opacity: 0, y: 35 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,7 +171,7 @@ export default function Page() {
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Full Name */}
           <motion.div
             initial={{ opacity: 0, x: -15 }}
@@ -61,6 +183,9 @@ export default function Page() {
             </label>
             <input
               type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
               placeholder="Enter your full name"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -78,6 +203,9 @@ export default function Page() {
             </label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Enter your email"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -95,6 +223,9 @@ export default function Page() {
             </label>
             <input
               type="text"
+              name="mobileNo"
+              value={formData.mobileNo}
+              onChange={handleChange}
               placeholder="Enter your mobile number"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -112,6 +243,9 @@ export default function Page() {
             </label>
             <input
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Create a password"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -129,6 +263,9 @@ export default function Page() {
             </label>
             <input
               type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
               placeholder="Re-enter password"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -142,7 +279,7 @@ export default function Page() {
             transition={{ delay: 0.68, duration: 0.5 }}
             className="flex items-start gap-2 text-sm"
           >
-            <input type="checkbox" className="mt-1 rounded" />
+            <input type="checkbox" className="mt-1 rounded" required />
             <p className="text-gray-600">
               I agree to the{" "}
               <span className="text-blue-700 font-semibold cursor-pointer hover:underline">
@@ -155,10 +292,11 @@ export default function Page() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            type="button"
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white py-2 rounded-lg font-semibold transition"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white py-2 rounded-lg font-semibold transition"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </motion.button>
 
           {/* Divider */}
@@ -180,8 +318,7 @@ export default function Page() {
               Login here
             </a>
           </motion.p>
-        </div>
-
+        </form>
       </motion.div>
     </div>
   );
