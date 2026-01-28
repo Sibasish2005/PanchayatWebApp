@@ -1,6 +1,8 @@
 'use client'
 import React from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import {
   FaFileAlt,
   FaRegClock,
@@ -9,6 +11,9 @@ import {
 } from "react-icons/fa";
 
 export default function Base() {
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
+
   const quickLinks = [
     {
       title: "Apply for Certificate",
@@ -99,30 +104,59 @@ export default function Base() {
                     key={idx}
                     className="border-b border-gray-200 last:border-none"
                   >
-                    <a
-                      href={item.href}
-                      className="
-                        flex items-start gap-3
-                        px-4 py-4
-                        hover:bg-blue-50
-                        transition
-                      "
-                    >
-                      {/* icon */}
-                      <div className="text-blue-700 text-xl mt-1">
-                        {item.icon}
-                      </div>
+                    {isLoggedIn ? (
+                      <Link
+                        href={item.href}
+                        className="
+                          flex items-start gap-3
+                          px-4 py-4
+                          hover:bg-blue-50
+                          transition
+                        "
+                      >
+                        {/* icon */}
+                        <div className="text-blue-700 text-xl mt-1">
+                          {item.icon}
+                        </div>
 
-                      {/* content */}
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-gray-800 text-sm sm:text-base">
-                          {item.title}
-                        </span>
-                        <span className="text-xs sm:text-sm text-gray-500 leading-snug">
-                          {item.desc}
-                        </span>
+                        {/* content */}
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-800 text-sm sm:text-base">
+                            {item.title}
+                          </span>
+                          <span className="text-xs sm:text-sm text-gray-500 leading-snug">
+                            {item.desc}
+                          </span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div
+                        className="
+                          flex items-start gap-3
+                          px-4 py-4
+                          opacity-60
+                          cursor-not-allowed
+                        "
+                      >
+                        {/* icon */}
+                        <div className="text-blue-700 text-xl mt-1">
+                          {item.icon}
+                        </div>
+
+                        {/* content */}
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-800 text-sm sm:text-base">
+                            {item.title}
+                          </span>
+                          <span className="text-xs sm:text-sm text-gray-500 leading-snug">
+                            {item.desc}
+                          </span>
+                          <span className="text-[10px] text-red-500 mt-1">
+                            Login required to access
+                          </span>
+                        </div>
                       </div>
-                    </a>
+                    )}
                   </li>
                 ))}
               </ul>

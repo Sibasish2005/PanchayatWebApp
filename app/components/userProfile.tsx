@@ -175,7 +175,7 @@ export default function UserProfile({
   );
 }
 
-/* ✅ Small reusable box */
+/* Small reusable box */
 function Detail({ label, value }: { label: string; value: string }) {
   const displayValue = value || "Not provided";
   return (
