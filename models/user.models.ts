@@ -33,7 +33,7 @@ const UserDataSchema: Schema<User> = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true // ✅ Make email unique
+        unique: true
     },
     mobileNo: {
         type: String,
