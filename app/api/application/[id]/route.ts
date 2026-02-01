@@ -1,3 +1,5 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectDB } from "@/lib/db";
 import Application from "@/models/application.models";
 import { NextResponse } from "next/server";
@@ -13,6 +15,14 @@ export async function DELETE(
   context: Context
 ): Promise<NextResponse> {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as { usertype?: string }).usertype !== "admin") {
+      return NextResponse.json(
+        { success: false, message: "Only admins can delete applications" },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
 
     const { id } = await context.params;
@@ -48,6 +58,14 @@ export async function DELETE(
 
 export async function PUT(request: Request, context: Context) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as { usertype?: string }).usertype !== "admin") {
+      return NextResponse.json(
+        { success: false, message: "Only admins can update applications" },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
 
     const { id } = await context.params;

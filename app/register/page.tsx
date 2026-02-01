@@ -11,13 +11,14 @@ export default function Page() {
     fullName: "",
     email: "",
     mobileNo: "",
+    role: "citizen" as "admin" | "citizen",
     password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -29,8 +30,8 @@ export default function Page() {
     console.log("Form submitted with data:", { ...formData, password: "***" });
 
     // Validation
-    if (!formData.fullName || !formData.email || !formData.mobileNo || !formData.password) {
-      toast.error("Please fill all fields");
+    if (!formData.fullName || !formData.email || !formData.mobileNo || !formData.password || !formData.role) {
+      toast.error("Please fill all fields including role");
       return;
     }
 
@@ -60,7 +61,7 @@ export default function Page() {
       // Create user data (password will be hashed on server)
       const userData = {
         username: formData.fullName,
-        usertype: "citizen", // Default user type
+        usertype: formData.role, // admin or citizen from form selection
         userId: userId, // Generate unique userId (max 20 chars)
         email: formData.email,
         mobileNo: formData.mobileNo,
@@ -230,6 +231,30 @@ export default function Page() {
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
                 focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
+          </motion.div>
+
+          {/* Role Selection */}
+          <motion.div
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.52, duration: 0.5 }}
+          >
+            <label className="block text-sm font-medium text-gray-700">
+              Register as
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg
+                focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+            >
+              <option value="citizen">Citizen</option>
+              <option value="admin">Admin</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              Citizen: apply for certificates. Admin: manage applications.
+            </p>
           </motion.div>
 
           {/* Password */}

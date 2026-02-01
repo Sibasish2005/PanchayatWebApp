@@ -75,7 +75,7 @@ export default function Navbar() {
               </>
             ) : (
               <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-white bg-red-600 rounded-3xl px-4 py-2 text-sm"
               >
                 Logout

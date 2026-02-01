@@ -2,11 +2,13 @@
 
 /**
  * ===========================
- * ✅ DASHBOARD COMPONENT (ADMIN)
+ * DASHBOARD COMPONENT
+ * Admin: can delete & update. Citizen: view only.
  * ===========================
  */
 
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import Loading from "./loading";
 import { MdDelete, MdEdit } from "react-icons/md";
 import toast from "react-hot-toast";
@@ -22,6 +24,9 @@ type Application = {
 };
 
 export default function DashboardComp() {
+  const { data: session, status } = useSession();
+  const isAdmin = (session?.user as { usertype?: string })?.usertype === "admin";
+
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -134,7 +139,7 @@ export default function DashboardComp() {
     }
   };
 
-  if (loading) return <Loading />;
+  if (status === "loading" || loading) return <Loading />;
 
   return (
     <div className="px-3 sm:px-6 lg:px-10 py-6 overflow-x-hidden">
@@ -148,7 +153,9 @@ export default function DashboardComp() {
                   Dashboard
                 </h1>
                 <p className="text-sm text-white/70">
-                  Manage Panchayat applications
+                  {isAdmin
+                    ? "Manage Panchayat applications (edit & delete)"
+                    : "View Panchayat applications (read only)"}
                 </p>
               </div>
 
@@ -185,7 +192,7 @@ export default function DashboardComp() {
                           "Document",
                           "Address",
                           "Submitted",
-                          "Actions",
+                          ...(isAdmin ? ["Actions"] : []),
                         ].map((h) => (
                           <th key={h} className="p-4 text-left font-semibold">
                             {h}
@@ -197,7 +204,7 @@ export default function DashboardComp() {
                     <tbody>
                       {apps.map((app) => (
                         <tr key={app._id} className="border-t hover:bg-blue-50">
-                          {editingId === app._id ? (
+                          {editingId === app._id && isAdmin ? (
                             <>
                               {["service", "name", "mobileNo", "documentType"].map(
                                 (field) => (
@@ -262,20 +269,22 @@ export default function DashboardComp() {
                               <td className="p-4 text-xs">
                                 {new Date(app.createdAt).toLocaleString()}
                               </td>
-                              <td className="p-4 flex gap-2 justify-end">
-                                <button
-                                  onClick={() => handleEdit(app)}
-                                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl"
-                                >
-                                  <MdEdit />
-                                </button>
-                                <button
-                                  onClick={() => deleteApplication(app._id)}
-                                  className="px-4 py-2 bg-red-100 text-red-700 rounded-xl"
-                                >
-                                  <MdDelete />
-                                </button>
-                              </td>
+                              {isAdmin && (
+                                <td className="p-4 flex gap-2 justify-end">
+                                  <button
+                                    onClick={() => handleEdit(app)}
+                                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl"
+                                  >
+                                    <MdEdit />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteApplication(app._id)}
+                                    className="px-4 py-2 bg-red-100 text-red-700 rounded-xl"
+                                  >
+                                    <MdDelete />
+                                  </button>
+                                </td>
+                              )}
                             </>
                           )}
                         </tr>
@@ -296,7 +305,7 @@ export default function DashboardComp() {
                         {new Date(app.createdAt).toLocaleString()}
                       </p>
 
-                      {editingId === app._id ? (
+                      {editingId === app._id && isAdmin ? (
                         <div className="mt-4 space-y-3">
                           {Object.keys(editingData).map((field) => (
                             <input
@@ -342,20 +351,22 @@ export default function DashboardComp() {
                             <b>Address:</b> {app.address}
                           </p>
 
-                          <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                            <button
-                              onClick={() => handleEdit(app)}
-                              className="w-full px-5 py-3 bg-blue-100 text-blue-700 rounded-xl"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => deleteApplication(app._id)}
-                              className="w-full px-5 py-3 bg-red-100 text-red-700 rounded-xl"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                          {isAdmin && (
+                            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                              <button
+                                onClick={() => handleEdit(app)}
+                                className="w-full px-5 py-3 bg-blue-100 text-blue-700 rounded-xl"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => deleteApplication(app._id)}
+                                className="w-full px-5 py-3 bg-red-100 text-red-700 rounded-xl"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

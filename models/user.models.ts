@@ -21,7 +21,8 @@ const UserDataSchema: Schema<User> = new Schema({
     },
     usertype: {
         type: String,
-        required: true
+        required: true,
+        enum: ["admin", "citizen"]
     },
     userId: {
         type: String,
