@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import UserDataModel from "@/models/user.models";
 import bcrypt from "bcryptjs"; 
 
+// just fot the commit
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
